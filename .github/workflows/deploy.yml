@@ -1,0 +1,40 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+
+    - name: Debug paths and run flutter pub get
+      run: |
+        echo "Current working directory: $(pwd)"
+        echo "Listing files in current directory:"
+        ls -la
+        echo "Searching for pubspec.yaml:"
+        find . -name pubspec.yaml
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Build web app
+      run: flutter build web
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/web
